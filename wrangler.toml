@@ -1,8 +1,7 @@
-name = "my-app"
+name = "explorer-nft-bot"
 type = "javascript"
 zone_id = ""
 account_id = ""
-route = ""
 workers_dev = true
 compatibility_date = "2022-04-28"
 
@@ -10,6 +9,9 @@ compatibility_date = "2022-04-28"
 command = "pnpm install && pnpm run build"
 [build.upload]
 format = "service-worker"
+
+[triggers]
+crons = ["*/10 * * * *"]
 
 kv_namespaces = [
   { binding = "NFT_EVENTS", id = "<ignored>", preview_id = "<ignored>" }

@@ -14,7 +14,7 @@ const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
 const DISCORD_BASE_URL = 'https://discord.com/api/v9';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
-export async function handleRequest(request: Request): Promise<Response> {
+export async function handleRequest(): Promise<Response> {
   let response = await fetch(
     `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
   );
@@ -110,5 +110,7 @@ export async function handleRequest(request: Request): Promise<Response> {
 
   await NFT_EVENTS.put(KV_LATEST_BLOCK_KEY, latestBlockHeightAPI.toString());
 
-  return new Response(`request method: ${request.method}`);
+  return new Response(
+    `${newSales.length} new sales for block ${latestBlockHeightSaved}`
+  );
 }
