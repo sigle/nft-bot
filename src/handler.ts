@@ -2,7 +2,7 @@ import {
   Routes,
   RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v9';
-import { ByzantionResponse, Doc } from './byzantion';
+import { Doc, getLatestSales } from './byzantion';
 import {
   getMarketplaceColor,
   getMarketplaceImage,
@@ -10,21 +10,11 @@ import {
   microToStacks,
 } from './utils';
 
-const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
 const DISCORD_BASE_URL = 'https://discord.com/api/v9';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
-  let response = await fetch(
-    `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
-  );
-
-  if (response.status !== 200) {
-    console.error(await response.text());
-    return new Response('API returned non-200 status code', { status: 400 });
-  }
-
-  const docs = (await response.json<ByzantionResponse>()).docs;
+  const docs = await getLatestSales();
 
   // Just for testing
   // await NFT_EVENTS.put(KV_LATEST_BLOCK_KEY, docs[2].block_height.toString());
@@ -107,7 +97,7 @@ export async function handleRequest(): Promise<Response> {
     }),
   };
 
-  response = await fetch(
+  const response = await fetch(
     `${DISCORD_BASE_URL}/${Routes.channelMessages(DISCORD_CHANNEL_ID)}`,
     {
       method: 'POST',
