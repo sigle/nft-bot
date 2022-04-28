@@ -8,6 +8,7 @@ import {
   getMarketplaceUrl,
   microToStacks,
 } from './utils';
+import { sendTweet, TwitterMessageInfo } from './twitter';
 
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
@@ -67,9 +68,28 @@ export async function handleRequest(): Promise<Response> {
     };
   });
 
+  const twitterMessagesInfo: TwitterMessageInfo[] = [];
+  // First we send the tweets, 1 tweet per sale
+  for (const currentSale of normalizedSales) {
+    const twitterMessageInfo = await sendTweet(
+      `Explorer #${currentSale.meta.tokenId} has been sold for ${
+        currentSale.salePriceFormattedSTX
+      } STX ($ ${currentSale.fiatPriceFormatted}).\n${getMarketplaceUrl(
+        currentSale.marketName,
+        currentSale.meta.tokenId
+      )}`,
+      currentSale.meta.image
+    );
+    twitterMessagesInfo.push(twitterMessageInfo);
+  }
+
   const discordMessage: RESTPostAPIChannelMessageJSONBody = {
     tts: false,
-    embeds: normalizedSales.map((currentSale) => {
+    embeds: normalizedSales.map((currentSale, index) => {
+      const twitterMessageInfo = twitterMessagesInfo[
+        index
+      ] as TwitterMessageInfo;
+
       return {
         color: getMarketplaceColor(currentSale.marketName),
         title: `Explorer #${currentSale.meta.tokenId} has been sold`,
@@ -88,7 +108,11 @@ export async function handleRequest(): Promise<Response> {
             value: `[View](https://explorer.stacks.co/txid/${currentSale.txId}?chain=mainnet)`,
             inline: true,
           },
-          // TODO add twitter link
+          {
+            name: 'Twitter',
+            value: `[View](https://www.twitter.com/${twitterMessageInfo.userId}/status/${twitterMessageInfo.statusId})`,
+            inline: true,
+          },
         ],
         image: {
           url: currentSale.meta.image,
