@@ -1,19 +1,27 @@
+import {
+  Routes,
+  RESTPostAPIChannelMessageJSONBody,
+} from 'discord-api-types/v9';
+import { microToStacks } from './utils';
+
+const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
+const DISCORD_BASE_URL = 'https://discord.com/api/v9';
+
 export async function handleRequest(request: Request): Promise<Response> {
-  // https://byzantion.xyz/api/actions/collectionActivity?contract_key=SP2X0TZ59D5SZ8ACQ6YMCHHNR2ZN51Z32E2CJ173.the-explorer-guild&skip=0&limit=15&eventTypes=[false,true,false,false]
-  const url =
-    'https://byzantion.xyz/api/actions/collectionActivity?contract_key=SP2X0TZ59D5SZ8ACQ6YMCHHNR2ZN51Z32E2CJ173.the-explorer-guild&skip=0&limit=15&eventTypes=[false,true,false,false]';
-  const response = await fetch(url);
+  let response = await fetch(
+    `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
+  );
 
   if (response.status !== 200) {
     console.error(await response.text());
     return new Response('API returned non-200 status code', { status: 400 });
   }
 
+  const docs = (await response.json<ByzantionResponse>()).docs;
+
   // Just for testing
   // await NFT_EVENTS.put('key', docs[1].block_height.toString());
   // return new Response(`Saved last block: ${docs[1].block_height}`);
-
-  const docs = (await response.json<ByzantionResponse>()).docs;
 
   const latest = await NFT_EVENTS.get('key');
 
@@ -37,9 +45,103 @@ export async function handleRequest(request: Request): Promise<Response> {
     }
   });
 
-  console.log('New sales found', newSales);
+  console.log('New sales found', JSON.stringify(newSales, null, 2));
 
-  // TODO notify services
+  const currentSale = newSales[0];
+
+  // TODO show price in USD
+
+  const getMarketplaceUrl = (marketplace: MarketName, nftId: number) => {
+    switch (marketplace) {
+      case MarketName.Stxnft:
+        return `https://gamma.io/collections/the-explorer-guild/${nftId}`;
+      case MarketName.Byzantion:
+        return `https://byzantion.xyz/collection/the-explorer-guild/${nftId}`;
+      case MarketName.StacksArt:
+        return `https://www.stacksart.com/collections/the-explorer-guild/${nftId}`;
+      default:
+        throw new Error(`Unknown marketplace: ${marketplace}`);
+    }
+  };
+
+  const getMarketplaceImage = (marketplace: MarketName) => {
+    switch (marketplace) {
+      case MarketName.Stxnft:
+        return `https://create.gamma.io/GammaLogo.jpg`;
+      case MarketName.Byzantion:
+        return `https://user-images.githubusercontent.com/65421744/165738019-90f45f70-9581-4303-8387-a0363c66bee0.jpeg`;
+      case MarketName.StacksArt:
+        return `https://www.stacksart.com/assets/logo.png`;
+      default:
+        throw new Error(`Unknown marketplace: ${marketplace}`);
+    }
+  };
+
+  const getMarketplaceColor = (marketplace: MarketName) => {
+    switch (marketplace) {
+      case MarketName.Stxnft:
+        return 0x5c9960;
+      case MarketName.Byzantion:
+        return 0xe06329;
+      case MarketName.StacksArt:
+        return 0xe4c4cdc;
+      default:
+        throw new Error(`Unknown marketplace: ${marketplace}`);
+    }
+  };
+
+  const salePrice = (
+    Math.round(microToStacks(currentSale.list_price) * 100) / 100
+  ).toLocaleString('en-US');
+
+  const discordMessage: RESTPostAPIChannelMessageJSONBody = {
+    tts: false,
+    embeds: [
+      {
+        color: getMarketplaceColor(currentSale.market_name),
+        title: `Explorer #${currentSale.meta_id[0].token_id} has been sold`,
+        url: getMarketplaceUrl(
+          currentSale.market_name,
+          currentSale.meta_id[0].token_id
+        ),
+        // TODO add our own rarity ranking
+        description: `**Price**: ${salePrice} STX`,
+        thumbnail: {
+          url: 'https://www.explorerguild.io/the-explorer-logo.png',
+        },
+        fields: [
+          {
+            name: 'Transaction',
+            value: `[View](https://explorer.stacks.co/txid/${currentSale.tx_id}?chain=mainnet)`,
+            inline: true,
+          },
+          // TODO add twitter link
+        ],
+        image: {
+          url: currentSale.meta_id[0].image,
+        },
+        timestamp: currentSale.burn_block_time_iso.toString(),
+        footer: {
+          text: 'The explorer Guild',
+          icon_url: getMarketplaceImage(currentSale.market_name),
+        },
+      },
+    ],
+  };
+
+  response = await fetch(
+    `${DISCORD_BASE_URL}/${Routes.channelMessages(DISCORD_CHANNEL_ID)}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bot ${DISCORD_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(discordMessage),
+    }
+  );
+  console.log(await response.json());
+  console.log(response.status);
 
   // await NFT_EVENTS.put('key', latestBlockHeightAPI.toString());
 
@@ -49,11 +151,6 @@ export async function handleRequest(request: Request): Promise<Response> {
 
   return new Response(`request method: ${request.method}`);
 }
-
-// TODO - detect new events from the API
-// TODO - throw error in case API structure changes
-// TODO - post event to discord
-// TODO - post event to twitter
 
 interface ByzantionResponse {
   docs: Doc[];
@@ -119,6 +216,7 @@ interface CollectionID {
 enum MarketName {
   Byzantion = 'byzantion',
   Stxnft = 'stxnft',
+  StacksArt = 'stacks_art',
 }
 
 interface MetaID {

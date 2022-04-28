@@ -6,6 +6,7 @@ specifiers:
   '@types/service-worker-mock': ^2.0.1
   '@typescript-eslint/eslint-plugin': ^4.16.1
   '@typescript-eslint/parser': ^4.16.1
+  discord-api-types: 0.32.0
   eslint: ^7.21.0
   eslint-config-prettier: ^8.1.0
   eslint-config-typescript: ^3.0.0
@@ -17,6 +18,9 @@ specifiers:
   typescript: ^4.3.2
   webpack: ^5.38.1
   webpack-cli: ^4.7.0
+
+dependencies:
+  discord-api-types: 0.32.0
 
 devDependencies:
   '@cloudflare/workers-types': 3.7.1
@@ -1542,6 +1546,10 @@ packages:
     dependencies:
       path-type: 4.0.0
     dev: true
+
+  /discord-api-types/0.32.0:
+    resolution: {integrity: sha512-i6HyCwWRocvtIcM7hamI3eQTCxLN/UvWtm/JktaXRSWDmASfhHam2juhej+e4U/Q/Fni1uUlyloMCBTL04Dl6Q==}
+    dev: false
 
   /doctrine/3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
