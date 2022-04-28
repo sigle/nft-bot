@@ -1,5 +1,5 @@
 import { RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v9';
-import { ByzantionResponse, Doc } from './byzantion';
+import { Doc, getLatestSales } from './byzantion';
 import { sendDiscordMessage } from './discord';
 import {
   getMarketplaceColor,
@@ -8,20 +8,10 @@ import {
   microToStacks,
 } from './utils';
 
-const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
-  const response = await fetch(
-    `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
-  );
-
-  if (response.status !== 200) {
-    console.error(await response.text());
-    return new Response('API returned non-200 status code', { status: 400 });
-  }
-
-  const docs = (await response.json<ByzantionResponse>()).docs;
+  const docs = await getLatestSales();
 
   // Just for testing
   // await NFT_EVENTS.put(KV_LATEST_BLOCK_KEY, docs[2].block_height.toString());
