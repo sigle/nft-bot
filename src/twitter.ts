@@ -1,4 +1,4 @@
-import { TweetV1 } from 'twitter-api-v2';
+import type { TweetV1 } from 'twitter-api-v2';
 
 // const twitterClient = new TwitterApi({
 //   appKey: TWITTER_API_KEY,
