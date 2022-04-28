@@ -1,9 +1,12 @@
-import { MarketName } from "./byzantion";
+import { MarketName } from './byzantion';
 
-export const microToStacks = (amountInMicroStacks: string | number) =>
+export const microToStacks = (amountInMicroStacks: string | number): number =>
   Number(amountInMicroStacks) / Math.pow(10, 6);
 
-export const getMarketplaceUrl = (marketplace: MarketName, nftId: number) => {
+export const getMarketplaceUrl = (
+  marketplace: MarketName,
+  nftId: number
+): string => {
   switch (marketplace) {
     case MarketName.Stxnft:
       return `https://gamma.io/collections/the-explorer-guild/${nftId}`;
@@ -16,7 +19,7 @@ export const getMarketplaceUrl = (marketplace: MarketName, nftId: number) => {
   }
 };
 
-export const getMarketplaceImage = (marketplace: MarketName) => {
+export const getMarketplaceImage = (marketplace: MarketName): string => {
   switch (marketplace) {
     case MarketName.Stxnft:
       return `https://create.gamma.io/GammaLogo.jpg`;
@@ -29,7 +32,7 @@ export const getMarketplaceImage = (marketplace: MarketName) => {
   }
 };
 
-export const getMarketplaceColor = (marketplace: MarketName) => {
+export const getMarketplaceColor = (marketplace: MarketName): number => {
   switch (marketplace) {
     case MarketName.Stxnft:
       return 0x5c9960;

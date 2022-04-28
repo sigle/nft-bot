@@ -33,7 +33,6 @@ interface CollectionID {
   asset_name: string;
   scanned: number;
   collection_size: number;
-  mint_functions: any[];
   description: string;
   artist: string;
   external_url: string;
@@ -41,7 +40,6 @@ interface CollectionID {
   floor: number;
   volume: number;
   cover_image: string;
-  attributes: any[];
   attributes_id: string;
   slug: string;
   collection_bid: boolean;
