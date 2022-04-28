@@ -1,6 +1,7 @@
 import { RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v9';
 import { Doc, getLatestSales } from './byzantion';
 import { sendDiscordMessage } from './discord';
+import { getSTXPrice } from './coingecko';
 import {
   getMarketplaceColor,
   getMarketplaceImage,
@@ -11,6 +12,7 @@ import {
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
+  const STXPriceInUSD = await getSTXPrice();
   const docs = await getLatestSales();
 
   // Just for testing
@@ -45,10 +47,17 @@ export async function handleRequest(): Promise<Response> {
       Math.round(salePriceSTX * 100) / 100
     ).toLocaleString('en-US');
 
+    const fiatPrice = salePriceSTX * STXPriceInUSD;
+    const fiatPriceFormatted = (
+      Math.round(fiatPrice * 100) / 100
+    ).toLocaleString('en-US');
+
     return {
       marketName: currentSale.market_name,
       salePriceSTX,
       salePriceFormattedSTX,
+      fiatPrice,
+      fiatPriceFormatted,
       txId: currentSale.tx_id,
       burnBlockTimeISO: currentSale.burn_block_time_iso,
       meta: {
@@ -69,8 +78,7 @@ export async function handleRequest(): Promise<Response> {
           currentSale.meta.tokenId
         ),
         // TODO add our own rarity ranking
-        // TODO show price in USD
-        description: `**Price**: ${currentSale.salePriceFormattedSTX} STX`,
+        description: `**Price**: ${currentSale.salePriceFormattedSTX} STX\n**Price USD**: $ ${currentSale.fiatPriceFormatted}`,
         thumbnail: {
           url: 'https://www.explorerguild.io/the-explorer-logo.png',
         },
