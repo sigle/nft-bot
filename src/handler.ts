@@ -1,8 +1,6 @@
-import {
-  Routes,
-  RESTPostAPIChannelMessageJSONBody,
-} from 'discord-api-types/v9';
+import { RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v9';
 import { ByzantionResponse, Doc } from './byzantion';
+import { sendDiscordMessage } from './discord';
 import {
   getMarketplaceColor,
   getMarketplaceImage,
@@ -11,7 +9,6 @@ import {
 } from './utils';
 
 const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
-const DISCORD_BASE_URL = 'https://discord.com/api/v9';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
@@ -92,21 +89,8 @@ export async function handleRequest(): Promise<Response> {
     }),
   };
 
-  response = await fetch(
-    `${DISCORD_BASE_URL}/${Routes.channelMessages(DISCORD_CHANNEL_ID)}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bot ${DISCORD_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(discordMessage),
-    }
-  );
-
-  // TODO handle discord error
-  const discordResponse = await response.json<{ id: string }>();
-  console.log('Discord message ID', discordResponse.id);
+  const discordMessageId = await sendDiscordMessage(discordMessage);
+  console.log(`Discord message ID ${discordMessageId}`);
 
   await NFT_EVENTS.put(KV_LATEST_BLOCK_KEY, latestBlockHeightAPI.toString());
 
