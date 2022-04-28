@@ -16,3 +16,10 @@ crons = ["*/10 * * * *"]
 kv_namespaces = [
   { binding = "NFT_EVENTS", id = "<ignored>", preview_id = "<ignored>" }
 ]
+
+[env.production]
+vars = { CONTRACT = "SP2X0TZ59D5SZ8ACQ6YMCHHNR2ZN51Z32E2CJ173.the-explorer-guild", DISCORD_CHANNEL_ID = "943176985528635392" }
+kv_namespaces = [
+  { binding = "NFT_EVENTS", id = "ef538e53bb9f4474820fa381c2b8c94d" }
+]
+
