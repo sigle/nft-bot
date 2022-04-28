@@ -12,7 +12,7 @@ const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
-  let response = await fetch(
+  const response = await fetch(
     `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
   );
 
