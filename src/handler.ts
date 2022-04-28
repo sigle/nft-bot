@@ -1,8 +1,6 @@
-import {
-  Routes,
-  RESTPostAPIChannelMessageJSONBody,
-} from 'discord-api-types/v9';
-import { ByzantionResponse, Doc } from './byzantion';
+import { RESTPostAPIChannelMessageJSONBody } from 'discord-api-types/v9';
+import { Doc, getLatestSales } from './byzantion';
+import { sendDiscordMessage } from './discord';
 import { getSTXPrice } from './coingecko';
 import {
   getMarketplaceColor,
@@ -11,23 +9,11 @@ import {
   microToStacks,
 } from './utils';
 
-const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
-const DISCORD_BASE_URL = 'https://discord.com/api/v9';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
   const STXPriceInUSD = await getSTXPrice();
-
-  let response = await fetch(
-    `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
-  );
-
-  if (response.status !== 200) {
-    console.error(await response.text());
-    return new Response('API returned non-200 status code', { status: 400 });
-  }
-
-  const docs = (await response.json<ByzantionResponse>()).docs;
+  const docs = await getLatestSales();
 
   // Just for testing
   // await NFT_EVENTS.put(KV_LATEST_BLOCK_KEY, docs[2].block_height.toString());
@@ -116,21 +102,8 @@ export async function handleRequest(): Promise<Response> {
     }),
   };
 
-  response = await fetch(
-    `${DISCORD_BASE_URL}/${Routes.channelMessages(DISCORD_CHANNEL_ID)}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bot ${DISCORD_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(discordMessage),
-    }
-  );
-
-  // TODO handle discord error
-  const discordResponse = await response.json<{ id: string }>();
-  console.log('Discord message ID', discordResponse.id);
+  const discordMessageId = await sendDiscordMessage(discordMessage);
+  console.log(`Discord message ID ${discordMessageId}`);
 
   await NFT_EVENTS.put(KV_LATEST_BLOCK_KEY, latestBlockHeightAPI.toString());
 

@@ -1,5 +1,5 @@
 export interface ByzantionResponse {
-  docs: Doc[];
+  docs?: Doc[];
 }
 
 export interface Doc {
@@ -96,3 +96,29 @@ interface MetaID {
   commission_key: null | string;
   last_update: Date;
 }
+
+const BYZANTION_BASE_URL = 'https://byzantion.xyz/api';
+
+export const getLatestSales = async (): Promise<Doc[]> => {
+  const response = await fetch(
+    `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
+  );
+
+  if (response.status !== 200) {
+    console.error(await response.text());
+    throw new Error('Byzantion API returned non-200 status code');
+  }
+
+  const byzantionResponse = await response.json<ByzantionResponse>();
+
+  // Verify proper format of the reply
+  if (!byzantionResponse.docs) {
+    console.error(
+      'coingeckoResponse',
+      JSON.stringify(byzantionResponse, null, 2)
+    );
+    throw new Error('Byzantion API returned invalid response');
+  }
+
+  return byzantionResponse.docs;
+};
