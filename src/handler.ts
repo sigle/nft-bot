@@ -52,41 +52,56 @@ export async function handleRequest(): Promise<Response> {
     }
   });
 
+  const normalizedSales = newSales.map((currentSale) => {
+    const salePriceSTX = microToStacks(currentSale.list_price);
+    const salePriceFormattedSTX = (
+      Math.round(salePriceSTX * 100) / 100
+    ).toLocaleString('en-US');
+
+    return {
+      marketName: currentSale.market_name,
+      salePriceSTX,
+      salePriceFormattedSTX,
+      txId: currentSale.tx_id,
+      burnBlockTimeISO: currentSale.burn_block_time_iso,
+      meta: {
+        tokenId: currentSale.meta_id[0].token_id,
+        image: currentSale.meta_id[0].image,
+      },
+    };
+  });
+
   const discordMessage: RESTPostAPIChannelMessageJSONBody = {
     tts: false,
-    embeds: newSales.map((currentSale) => {
-      const salePrice = (
-        Math.round(microToStacks(currentSale.list_price) * 100) / 100
-      ).toLocaleString('en-US');
-
+    embeds: normalizedSales.map((currentSale) => {
       return {
-        color: getMarketplaceColor(currentSale.market_name),
-        title: `Explorer #${currentSale.meta_id[0].token_id} has been sold`,
+        color: getMarketplaceColor(currentSale.marketName),
+        title: `Explorer #${currentSale.meta.tokenId} has been sold`,
         url: getMarketplaceUrl(
-          currentSale.market_name,
-          currentSale.meta_id[0].token_id
+          currentSale.marketName,
+          currentSale.meta.tokenId
         ),
         // TODO add our own rarity ranking
         // TODO show price in USD
-        description: `**Price**: ${salePrice} STX`,
+        description: `**Price**: ${currentSale.salePriceFormattedSTX} STX`,
         thumbnail: {
           url: 'https://www.explorerguild.io/the-explorer-logo.png',
         },
         fields: [
           {
             name: 'Transaction',
-            value: `[View](https://explorer.stacks.co/txid/${currentSale.tx_id}?chain=mainnet)`,
+            value: `[View](https://explorer.stacks.co/txid/${currentSale.txId}?chain=mainnet)`,
             inline: true,
           },
           // TODO add twitter link
         ],
         image: {
-          url: currentSale.meta_id[0].image,
+          url: currentSale.meta.image,
         },
-        timestamp: currentSale.burn_block_time_iso.toString(),
+        timestamp: currentSale.burnBlockTimeISO.toString(),
         footer: {
           text: 'The explorer Guild',
-          icon_url: getMarketplaceImage(currentSale.market_name),
+          icon_url: getMarketplaceImage(currentSale.marketName),
         },
       };
     }),
