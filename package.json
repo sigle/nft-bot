@@ -4,6 +4,7 @@
   "description": "Cloudflare worker TypeScript template",
   "main": "dist/worker.js",
   "scripts": {
+    "dev": "miniflare dist/worker.js --watch --debug --kv NFT_EVENTS",
     "build": "webpack",
     "prettier": "prettier --write '**/*.{json,md,js,ts,jsx,tsx,yml,css}'",
     "lint": "eslint --max-warnings=0 src && prettier --check '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
