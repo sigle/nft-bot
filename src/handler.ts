@@ -3,6 +3,7 @@ import {
   RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v9';
 import { ByzantionResponse, Doc } from './byzantion';
+import { getSTXPrice } from './coingecko';
 import {
   getMarketplaceColor,
   getMarketplaceImage,
@@ -15,6 +16,8 @@ const DISCORD_BASE_URL = 'https://discord.com/api/v9';
 const KV_LATEST_BLOCK_KEY = 'latest-block';
 
 export async function handleRequest(): Promise<Response> {
+  const STXPriceInUSD = await getSTXPrice();
+
   let response = await fetch(
     `${BYZANTION_BASE_URL}/actions/collectionActivity?contract_key=${CONTRACT}&skip=0&limit=15&eventTypes=[false,true,false,false]`
   );
@@ -55,8 +58,14 @@ export async function handleRequest(): Promise<Response> {
   const discordMessage: RESTPostAPIChannelMessageJSONBody = {
     tts: false,
     embeds: newSales.map((currentSale) => {
-      const salePrice = (
-        Math.round(microToStacks(currentSale.list_price) * 100) / 100
+      const listPriceSTX = microToStacks(currentSale.list_price);
+      const fiatPrice = listPriceSTX * STXPriceInUSD;
+
+      const salePriceFormattedSTX = (
+        Math.round(listPriceSTX * 100) / 100
+      ).toLocaleString('en-US');
+      const fiatPriceFormattedSTX = (
+        Math.round(fiatPrice * 100) / 100
       ).toLocaleString('en-US');
 
       return {
@@ -67,8 +76,7 @@ export async function handleRequest(): Promise<Response> {
           currentSale.meta_id[0].token_id
         ),
         // TODO add our own rarity ranking
-        // TODO show price in USD
-        description: `**Price**: ${salePrice} STX`,
+        description: `**Price**: ${salePriceFormattedSTX} STX\n**Price USD**: $ ${fiatPriceFormattedSTX}`,
         thumbnail: {
           url: 'https://www.explorerguild.io/the-explorer-logo.png',
         },
