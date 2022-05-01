@@ -2,16 +2,19 @@ lockfileVersion: 5.3
 
 specifiers:
   '@cloudflare/workers-types': 3.7.1
+  '@types/crypto-js': 4.1.1
   '@types/jest': 27.4.1
   '@types/service-worker-mock': 2.0.1
   '@typescript-eslint/eslint-plugin': 5.21.0
   '@typescript-eslint/parser': 5.21.0
+  crypto-js: 4.1.1
   discord-api-types: 0.32.0
   eslint: 8.14.0
   eslint-config-prettier: 8.5.0
   eslint-config-typescript: 3.0.0
   jest: 27.0.1
   jest-environment-miniflare: 2.4.0
+  oauth-1.0a: 2.2.6
   prettier: ^2.3.0
   service-worker-mock: ^2.0.5
   ts-jest: 27.1.4
@@ -22,11 +25,14 @@ specifiers:
   webpack-cli: 4.9.2
 
 dependencies:
+  crypto-js: 4.1.1
   discord-api-types: 0.32.0
+  oauth-1.0a: 2.2.6
   twitter-api-v2: 1.12.0
 
 devDependencies:
   '@cloudflare/workers-types': 3.7.1
+  '@types/crypto-js': 4.1.1
   '@types/jest': 27.4.1
   '@types/service-worker-mock': 2.0.1
   '@typescript-eslint/eslint-plugin': 5.21.0_829e74f28e9c9eb05edda582d47d45b8
@@ -861,6 +867,10 @@ packages:
       '@babel/types': 7.17.0
     dev: true
 
+  /@types/crypto-js/4.1.1:
+    resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
+    dev: true
+
   /@types/eslint-scope/3.7.3:
     resolution: {integrity: sha512-PB3ldyrcnAicT35TWPs5IcwKD8S333HMaa2VVv4+wdvebJkjWuW/xESoB8IwRcog8HYVYamb1g/R31Qv5Bx03g==}
     dependencies:
@@ -1620,6 +1630,10 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /crypto-js/4.1.1:
+    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
+    dev: false
 
   /cssom/0.3.8:
     resolution: {integrity: sha512-b0tGHbfegbhPJpxpiBPU2sCkigAqtM9O121le6bbOlgyV+NyGyCmVfJ6QW9eRjz8CpNfWEOYBIMIGRYkLwsIYg==}
@@ -3212,6 +3226,10 @@ packages:
   /nwsapi/2.2.0:
     resolution: {integrity: sha512-h2AatdwYH+JHiZpv7pt/gSX1XoRGb7L/qSIeuqA6GwYoF9w1vP1cw42TO0aI2pNyshRK5893hNSl+1//vHK7hQ==}
     dev: true
+
+  /oauth-1.0a/2.2.6:
+    resolution: {integrity: sha512-6bkxv3N4Gu5lty4viIcIAnq5GbxECviMBeKR3WX/q87SPQ8E8aursPZUtsXDnxCs787af09WPRBLqYrf/lwoYQ==}
+    dev: false
 
   /once/1.4.0:
     resolution: {integrity: sha1-WDsap3WWHUsROsF9nFC6753Xa9E=}

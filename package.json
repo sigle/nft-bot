@@ -22,11 +22,14 @@
     ]
   },
   "dependencies": {
+    "crypto-js": "4.1.1",
     "discord-api-types": "0.32.0",
+    "oauth-1.0a": "2.2.6",
     "twitter-api-v2": "1.12.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.7.1",
+    "@types/crypto-js": "4.1.1",
     "@types/jest": "27.4.1",
     "@types/service-worker-mock": "2.0.1",
     "@typescript-eslint/eslint-plugin": "5.21.0",
