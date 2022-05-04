@@ -3,13 +3,6 @@ import type { TweetV1, MediaStatusV1Result } from 'twitter-api-v2';
 import OAuth from 'oauth-1.0a';
 import { HmacSHA1, enc } from 'crypto-js';
 
-// const twitterClient = new TwitterApi({
-//   appKey: TWITTER_API_KEY,
-//   appSecret: TWITTER_API_SECRET,
-//   accessToken: TWITTER_ACCESS_TOKEN,
-//   accessSecret: TWITTER_ACCESS_TOKEN_SECRET,
-// });
-
 const oauth = new OAuth({
   consumer: { key: TWITTER_API_KEY, secret: TWITTER_API_SECRET },
   signature_method: 'HMAC-SHA1',
