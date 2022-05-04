@@ -39,7 +39,7 @@ export const getMarketplaceColor = (marketplace: MarketName): number => {
     case MarketName.Byzantion:
       return 0xe06329;
     case MarketName.StacksArt:
-      return 0xe4c4cdc;
+      return 0x4e46e5;
     default:
       throw new Error(`Unknown marketplace: ${marketplace}`);
   }
