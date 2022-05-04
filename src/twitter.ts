@@ -1,5 +1,5 @@
 // twitter-api-v2 is only used for types as it doesn't work in non nodejs environments
-import type { TweetV1 } from 'twitter-api-v2';
+import type { TweetV1, MediaStatusV1Result } from 'twitter-api-v2';
 import OAuth from 'oauth-1.0a';
 import { HmacSHA1, enc } from 'crypto-js';
 
@@ -28,51 +28,53 @@ export interface TwitterMessageInfo {
   statusId: string;
 }
 
+/**
+ * Send a tweet with an image attached to it.
+ * 1. Fetch the image and save it as base64.
+ * 2. Upload to image to Twitter.
+ * 3. Send the tweet with the image attached.
+ */
 export const sendTweet = async (
   message: string,
   image: string
 ): Promise<TwitterMessageInfo> => {
-  //   let imageBuffer: Buffer;
-  //   let imageType: string;
-  //   try {
-  //     const response = await fetch(image);
-  //     const arrayBuffer = await response.arrayBuffer();
-  //     imageBuffer = Buffer.from(arrayBuffer);
-  //     const arr = response.headers.get('content-type')?.split('/');
-  //     imageType = arr?.[arr?.length - 1] || 'png';
-  //   } catch (error) {
-  //     console.error(error, JSON.stringify(error, null, 2));
-  //     throw new Error('Failed to fetch image');
-  //   }
-  //   console.log({ imageType });
+  let imageBuffer: string;
+  let response = await fetch(image);
+  const arrayBuffer = await response.arrayBuffer();
+  imageBuffer = Buffer.from(arrayBuffer).toString('base64');
 
-  try {
-    //   const mediaID = await twitterClient.v1.uploadMedia(imageBuffer, {
-    //     type: imageType,
-    //   });
-    //   const response = await twitterClient.v1.tweet(message, {
-    //     media_ids: [mediaID],
-    //   });
-    //   return { userId: response.user.id_str, statusId: response.id_str };
+  const requestDataMedia = {
+    url: 'https://upload.twitter.com/1.1/media/upload.json',
+    method: 'POST',
+    data: { media_data: imageBuffer, media_category: 'tweet_image' },
+  };
+  response = await fetch(requestDataMedia.url, {
+    method: requestDataMedia.method,
+    headers: {
+      ...oauth.toHeader(oauth.authorize(requestDataMedia, oauthToken)),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(requestDataMedia.data),
+  });
 
-    const requestData = {
-      url: 'https://api.twitter.com/1.1/statuses/update.json',
-      method: 'POST',
-      data: { status: message },
-    };
+  const mediaData = await response.json<MediaStatusV1Result>();
 
-    const response = await fetch(requestData.url, {
-      method: requestData.method,
-      headers: {
-        ...oauth.toHeader(oauth.authorize(requestData, oauthToken)),
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams(requestData.data),
-    });
-    console.log(await response.json());
-  } catch (error) {
-    console.error(JSON.stringify(error, null, 2));
-    throw new Error('Twitter API returned error');
-  }
-  return { userId: 'response.user.id_str', statusId: 'response.id_str' };
+  const requestDataTweet = {
+    url: 'https://api.twitter.com/1.1/statuses/update.json',
+    method: 'POST',
+    // media_ids is not an array as url params does not accept arrays
+    data: { status: message, media_ids: mediaData.media_id_string },
+  };
+
+  response = await fetch(requestDataTweet.url, {
+    method: requestDataTweet.method,
+    headers: {
+      ...oauth.toHeader(oauth.authorize(requestDataTweet, oauthToken)),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(requestDataTweet.data),
+  });
+  const tweetData = await response.json<TweetV1>();
+  console.log({ tweetData, status: response.status });
+  return { userId: tweetData.user.id_str, statusId: tweetData.id_str };
 };
