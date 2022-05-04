@@ -48,6 +48,12 @@ export const sendTweet = async (
     },
     body: new URLSearchParams(requestDataMedia.data),
   });
+
+  if (response.status !== 200) {
+    console.error(await response.text());
+    throw new Error('Twitter API returned non-200 status code for Media');
+  }
+
   const mediaData = await response.json<MediaStatusV1Result>();
 
   const requestDataTweet = {
@@ -65,6 +71,12 @@ export const sendTweet = async (
     },
     body: new URLSearchParams(requestDataTweet.data),
   });
+
+  if (response.status !== 200) {
+    console.error(await response.text());
+    throw new Error('Twitter API returned non-200 status code for Tweet');
+  }
+
   const tweetData = await response.json<TweetV1>();
 
   return { userId: tweetData.user.id_str, statusId: tweetData.id_str };
