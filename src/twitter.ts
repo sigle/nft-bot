@@ -38,10 +38,9 @@ export const sendTweet = async (
   message: string,
   image: string
 ): Promise<TwitterMessageInfo> => {
-  let imageBuffer: string;
   let response = await fetch(image);
   const arrayBuffer = await response.arrayBuffer();
-  imageBuffer = Buffer.from(arrayBuffer).toString('base64');
+  const imageBuffer = Buffer.from(arrayBuffer).toString('base64');
 
   const requestDataMedia = {
     url: 'https://upload.twitter.com/1.1/media/upload.json',
