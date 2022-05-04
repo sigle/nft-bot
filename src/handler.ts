@@ -74,7 +74,7 @@ export async function handleRequest(): Promise<Response> {
     const twitterMessageInfo = await sendTweet(
       `Explorer #${currentSale.meta.tokenId} has been sold for ${
         currentSale.salePriceFormattedSTX
-      } STX ($ ${currentSale.fiatPriceFormatted}).\n${getMarketplaceUrl(
+      } STX ($${currentSale.fiatPriceFormatted}).\n${getMarketplaceUrl(
         currentSale.marketName,
         currentSale.meta.tokenId
       )}`,
@@ -97,7 +97,6 @@ export async function handleRequest(): Promise<Response> {
           currentSale.marketName,
           currentSale.meta.tokenId
         ),
-        // TODO add our own rarity ranking
         description: `**Price**: ${currentSale.salePriceFormattedSTX} STX\n**Price USD**: $ ${currentSale.fiatPriceFormatted}`,
         thumbnail: {
           url: 'https://www.explorerguild.io/the-explorer-logo.png',
