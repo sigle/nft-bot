@@ -48,7 +48,6 @@ export const sendTweet = async (
     },
     body: new URLSearchParams(requestDataMedia.data),
   });
-
   const mediaData = await response.json<MediaStatusV1Result>();
 
   const requestDataTweet = {
@@ -67,6 +66,6 @@ export const sendTweet = async (
     body: new URLSearchParams(requestDataTweet.data),
   });
   const tweetData = await response.json<TweetV1>();
-  console.log({ tweetData, status: response.status });
+
   return { userId: tweetData.user.id_str, statusId: tweetData.id_str };
 };
