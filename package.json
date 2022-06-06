@@ -22,7 +22,7 @@
     ]
   },
   "dependencies": {
-    "@sentry/node": "7.0.0",
+    "@sentry/browser": "7.0.0",
     "crypto-js": "4.1.1",
     "discord-api-types": "0.32.0",
     "oauth-1.0a": "2.2.6",

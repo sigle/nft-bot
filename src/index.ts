@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import * as Sentry from '@sentry/browser';
 import { handleRequest } from './handler';
 
 Sentry.init({
