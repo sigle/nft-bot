@@ -1,14 +1,10 @@
 name = "explorer-nft-bot"
-type = "javascript"
-zone_id = ""
-account_id = ""
+main="dist/worker.js"
 workers_dev = true
 compatibility_date = "2022-04-28"
 
 [build]
 command = "pnpm install && pnpm run build"
-[build.upload]
-format = "service-worker"
 
 [triggers]
 crons = ["*/10 * * * *"]

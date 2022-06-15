@@ -12,7 +12,11 @@ export const getSTXPrice = async (): Promise<number> => {
   );
 
   if (response.status !== 200) {
-    console.error(await response.text());
+    console.error(
+      'coingecko response error',
+      response.status,
+      await response.text()
+    );
     throw new Error('Coingecko API returned non-200 status code');
   }
 
