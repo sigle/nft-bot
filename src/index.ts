@@ -1,23 +1,39 @@
-import * as Sentry from '@sentry/browser';
+import Toucan from 'toucan-js';
 import { handleRequest } from './handler';
 
-Sentry.init({
-  dsn: SENTRY_DSN,
+addEventListener('fetch', (event) => {
+  const sentry = new Toucan({
+    dsn: SENTRY_DSN,
+    context: event,
+  });
+
+  event.respondWith(
+    (async function () {
+      try {
+        return await handleRequest();
+      } catch (err) {
+        const sentryId = sentry.captureException(err);
+        return new Response(`Internal server error. Event ID: ${sentryId}`, {
+          status: 500,
+        });
+      }
+    })()
+  );
 });
 
-// addEventListener('fetch', (event) => {
-//   event.respondWith(handleRequest());
-// });
-
 addEventListener('scheduled', (event) => {
+  const sentry = new Toucan({
+    dsn: SENTRY_DSN,
+    context: event,
+  });
+
   event.waitUntil(
     (async function () {
       try {
         return await handleRequest();
-      } catch (error) {
-        Sentry.captureException(error);
-        await Sentry.flush(2000);
-        return new Response('Internal server error', {
+      } catch (err) {
+        const sentryId = sentry.captureException(err);
+        return new Response(`Internal server error. Event ID: ${sentryId}`, {
           status: 500,
         });
       }
