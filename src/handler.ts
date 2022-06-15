@@ -48,10 +48,10 @@ export async function handleRequest(): Promise<Response> {
       Math.round(salePriceSTX * 100) / 100
     ).toLocaleString('en-US');
 
-    const fiatPrice = salePriceSTX * STXPriceInUSD;
-    const fiatPriceFormatted = (
-      Math.round(fiatPrice * 100) / 100
-    ).toLocaleString('en-US');
+    const fiatPrice = STXPriceInUSD ? salePriceSTX * STXPriceInUSD : null;
+    const fiatPriceFormatted = fiatPrice
+      ? (Math.round(fiatPrice * 100) / 100).toLocaleString('en-US')
+      : null;
 
     return {
       marketName: currentSale.market_name,
@@ -74,7 +74,11 @@ export async function handleRequest(): Promise<Response> {
     const twitterMessageInfo = await sendTweet(
       `Explorer #${currentSale.meta.tokenId} has been sold for ${
         currentSale.salePriceFormattedSTX
-      } STX ($${currentSale.fiatPriceFormatted}).\n${getMarketplaceUrl(
+      } STX${
+        currentSale.fiatPriceFormatted
+          ? `($${currentSale.fiatPriceFormatted})`
+          : ''
+      }.\n${getMarketplaceUrl(
         currentSale.marketName,
         currentSale.meta.tokenId
       )}`,
@@ -97,7 +101,11 @@ export async function handleRequest(): Promise<Response> {
           currentSale.marketName,
           currentSale.meta.tokenId
         ),
-        description: `**Price**: ${currentSale.salePriceFormattedSTX} STX\n**Price USD**: $ ${currentSale.fiatPriceFormatted}`,
+        description: `**Price**: ${currentSale.salePriceFormattedSTX} STX\n${
+          currentSale.fiatPriceFormatted
+            ? `**Price USD**: $ ${currentSale.fiatPriceFormatted}`
+            : ''
+        }`,
         thumbnail: {
           url: 'https://www.explorerguild.io/the-explorer-logo.png',
         },

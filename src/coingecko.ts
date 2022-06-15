@@ -6,12 +6,19 @@ interface CoingeckoResponse {
   };
 }
 
-export const getSTXPrice = async (): Promise<number> => {
+export const getSTXPrice = async (): Promise<number | null> => {
   const response = await fetch(
     `${COINGECKO_BASE_API}/simple/price?ids=blockstack&vs_currencies=usd`
   );
 
   if (response.status !== 200) {
+    /**
+     * As cloudflare worker is sharing the IP we can get rate limited easily.
+     */
+    if (response.status === 403) {
+      return null;
+    }
+
     console.error(
       'coingecko response error',
       response.status,
